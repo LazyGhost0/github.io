@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>я часто тороплюсь с выводами, незадумываясь..</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #0a0a2a, #1a1a4a, #2a2a6a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .messages-container {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .message.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .message.exiting {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.9);
+            filter: blur(10px);
+        }
+
+        .content {
+            max-width: 800px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b9d, #6b9dff, #9dff6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: textGradient 3s ease infinite;
+            font-weight: 300;
+            letter-spacing: 3px;
+        }
+
+        @keyframes textGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        h2 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            color: #6b9dff;
+            font-weight: 300;
+            text-shadow: 0 0 30px rgba(107, 157, 255, 0.5);
+        }
+
+        .main-text {
+            font-size: 2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, 
+                rgba(255, 107, 157, 0.2) 0%, 
+                rgba(107, 157, 255, 0.2) 100%);
+            padding: 25px 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.8em;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .heart {
+            font-size: 5em;
+            margin: 40px 0;
+            animation: magicalFloat 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes magicalFloat {
+            0%, 100% { 
+                transform: translateY(0) scale(1) rotate(0deg);
+                filter: hue-rotate(0deg) drop-shadow(0 0 20px rgba(255, 107, 157, 0.5));
+            }
+            33% { 
+                transform: translateY(-20px) scale(1.2) rotate(5deg);
+                filter: hue-rotate(120deg) drop-shadow(0 0 30px rgba(107, 157, 255, 0.7));
+            }
+            66% { 
+                transform: translateY(10px) scale(1.1) rotate(-3deg);
+                filter: hue-rotate(240deg) drop-shadow(0 0 25px rgba(157, 255, 107, 0.6));
+            }
+        }
+
+        .final-button {
+            background: linear-gradient(45deg, #ff6b9d, #6b9dff);
+            color: white;
+            border: none;
+            padding: 25px 60px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 40px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.3);
+        }
+
+        .final-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.5);
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff6b9d;
+            text-align: center;
+            z-index: 1000;
+            animation: gentlePulse 2s ease-in-out infinite;
+            background: rgba(255, 107, 157, 0.1);
+            padding: 15px 30px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            font-size: 1.1em;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { 
+                opacity: 0.7;
+                transform: translateX(-50%) scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: translateX(-50%) scale(1.05);
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: gold;
+            border-radius: 50%;
+            animation: particleFloat 6s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="scroll-hint" id="scrollHint">
+        🔽 Листай колесиком мыши вниз 🔽
+    </div>
+
+    <div class="messages-container" id="messagesContainer">
+        <!-- Сообщение 1 -->
+        <div class="message active" id="message1">
+            <div class="content">
+                <h1>Привет, родная... 🌟</h1>
+                <div class="main-text">
+                    <p>может я просто вкрай стал тупым...</p>
+                    <div class="heart">💫</div>
+                    <p>Просто листай вниз</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение 2 -->
+        <div class="message" id="message2">
+            <div class="content">
+                <h2>не хотел показаться грубым</h2>
+                <div class="main-text">
+                    <p>не хотел испортить настроение...</p>
+                    <div class="highlight">
+                        возможно был не прав, не так ли?
+                    </div>
+                    <p>сосала?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение 3 -->
+        <div class="message" id="message3">
+            <div class="content">
+                <h2>изи бриджи</h2>
+                <div class="main-text">
+                    <p>а че писать дальше</p>
+                    <div class="highlight">
+                        ЕЩКЕРЕ<br>
+                        дальше
+                    </div>
+                    <div class="heart">💔</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение 4 -->
+        <div class="message" id="message4">
+            <div class="content">
+                <h2>так о чем это я</h2>
+                <div class="main-text">
+                    <p>лады, я был не прав</p>
+                    <div class="highlight">
+                        все путем<br>
+                        просто не соси кому попало
+                    </div>
+                    <p>да шучу я, дальш</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение 5 -->
+        <div class="message" id="message5">
+            <div class="content">
+                <h2>постараюсь понимать ситуации</h2>
+                <div class="main-text">
+                    <p>научите меня понимать "/</p>
+                    <div class="heart">🥺</div>
+                    <div class="highlight">
+                        не знаю че еще сказать<br>
+                        просто любуйся красивым сайтом
+                    </div>
+                    <p>надеюсь не зря старался</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение 6 -->
+        <div class="message" id="message6">
+            <div class="content">
+                <h1>\('v')/</h1>
+                <div class="main-text">
+                    <p>долистались</p>
+                    <div class="heart">w</div>
+                    <div class="highlight">
+                        постараюсь так больше не делать<br>
+                        поиграем во что нибуть?)
+                    </div>
+                    <button class="final-button" onclick="showFinalMagic()">
+                        Принять моё предложение? ✨
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMessage = 1;
+        const totalMessages = 6;
+        let canChange = true;
+
+        // Создаем частицы
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.cssText = `
+                    left: ${Math.random() * 100}%;
+                    animation-delay: ${Math.random() * 6}s;
+                    background: hsl(${Math.random() * 360}, 100%, 70%);
+                `;
+                container.appendChild(particle);
+            }
+        }
+
+        // Плавная смена сообщений
+        function showNextMessage() {
+            if (!canChange || currentMessage >= totalMessages) return;
+            
+            canChange = false;
+            
+            const currentElement = document.getElementById('message' + currentMessage);
+            const nextElement = document.getElementById('message' + (currentMessage + 1));
+            
+            // Начинаем исчезновение текущего сообщения
+            currentElement.classList.add('exiting');
+            
+            setTimeout(() => {
+                // Убираем текущее сообщение
+                currentElement.classList.remove('active', 'exiting');
+                
+                // Показываем следующее сообщение
+                nextElement.classList.add('active');
+                
+                currentMessage++;
+                canChange = true;
+                
+                // Скрываем подсказку после первого перехода
+                if (currentMessage === 2) {
+                    document.getElementById('scrollHint').style.opacity = '0.5';
+                }
+                
+            }, 600); // Задержка между исчезновением и появлением
+        }
+
+        function showPreviousMessage() {
+            if (!canChange || currentMessage <= 1) return;
+            
+            canChange = false;
+            
+            const currentElement = document.getElementById('message' + currentMessage);
+            const prevElement = document.getElementById('message' + (currentMessage - 1));
+            
+            // Начинаем исчезновение текущего сообщения
+            currentElement.classList.add('exiting');
+            
+            setTimeout(() => {
+                // Убираем текущее сообщение
+                currentElement.classList.remove('active', 'exiting');
+                
+                // Показываем предыдущее сообщение
+                prevElement.classList.add('active');
+                
+                currentMessage--;
+                canChange = true;
+            }, 600);
+        }
+
+        // Обработчик колесика мыши
+        let scrollTimeout;
+        window.addEventListener('wheel', (e) => {
+            clearTimeout(scrollTimeout);
+            
+            if (!canChange) return;
+            
+            if (e.deltaY > 0) {
+                // Скролл вниз
+                showNextMessage();
+            } else if (e.deltaY < 0) {
+                // Скролл вверх
+                showPreviousMessage();
+            }
+            
+            scrollTimeout = setTimeout(() => {
+                canChange = true;
+            }, 800);
+        });
+
+        // Обработчики клавиш для удобства
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter') {
+                showNextMessage();
+            } else if (e.key === 'ArrowUp') {
+                showPreviousMessage();
+            }
+        });
+
+        // Финальная магия
+        function showFinalMagic() {
+            createMagicConfetti();
+            
+            document.body.style.background = 'linear-gradient(-45deg, #ff6b9d, #6b9dff, #9dff6b, #ffd96b)';
+            document.body.style.animation = 'gradientShift 2s ease infinite';
+            
+            setTimeout(() => {
+                alert('Ты сделала меня самым счастливым человеком во вселенной! 🌌\n' +
+                      'Спасибо, что ты есть! 💫\n' +
+                      'Я обещаю быть лучше для тебя! 💖');
+            }, 1000);
+        }
+
+        function createMagicConfetti() {
+            const colors = ['#ff6b9d', '#6b9dff', '#9dff6b', '#ffd96b', '#d96bff', '#6bffd9'];
+            for (let i = 0; i < 200; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: ${Math.random() * 20 + 8}px;
+                        height: ${Math.random() * 20 + 8}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '15%'};
+                        top: -50px;
+                        left: ${Math.random() * 100}%;
+                        animation: magicFall ${Math.random() * 3 + 2}s ease-in forwards;
+                        z-index: 10000;
+                        transform: rotate(${Math.random() * 360}deg);
+                        box-shadow: 0 0 20px currentColor;
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 15);
+            }
+
+            // Добавляем стили для анимации конфетти
+            if (!document.querySelector('#magicConfettiStyles')) {
+                const style = document.createElement('style');
+                style.id = 'magicConfettiStyles';
+                style.textContent = `
+                    @keyframes magicFall {
+                        0% {
+                            transform: translateY(0) rotate(0deg) scale(0);
+                            opacity: 1;
+                        }
+                        50% {
+                            transform: translateY(50vh) rotate(180deg) scale(1);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: translateY(100vh) rotate(360deg) scale(0);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Инициализация
+        createParticles();
+
+        // Автопереход через 8 секунд на первом экране
+        setTimeout(() => {
+            if (currentMessage === 1) {
+                showNextMessage();
+            }
+        }, 8000);
+    </script>
+</body>
+</html>
